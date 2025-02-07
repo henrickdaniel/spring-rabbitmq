@@ -27,7 +27,7 @@ public class Sender {
     private final String[] keys = {"quick.orange.rabbit", "lazy.orange.elephant", "quick.orange.fox",
             "lazy.brown.fox", "lazy.pink.rabbit", "quick.brown.fox"};
 
-    @Scheduled(fixedDelay = 1000, initialDelay = 500)
+
     public void send() {
         StringBuilder builder = new StringBuilder("Hello to ");
         if (this.index.incrementAndGet() == keys.length) {
