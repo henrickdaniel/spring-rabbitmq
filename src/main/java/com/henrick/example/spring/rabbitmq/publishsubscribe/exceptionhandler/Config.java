@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Profile("publish-subscribe-exception-handler")
 @Configuration
 public class Config {
@@ -15,16 +18,37 @@ public class Config {
         return new FanoutExchange("tut.fanout");
     }
 
+    @Bean
+    public FanoutExchange fanoutDlx() {
+        return new FanoutExchange("tut.fanout.dlx");
+    }
+
     private static class ReceiverConfig {
 
         @Bean
         public Queue autoDeleteQueue1() {
-            return new Queue("retry-test");
+            Map<String, Object> args = new HashMap<>();
+            args.put("x-dead-letter-exchange", "tut.fanout.dlx");
+//            args.put("x-dead-letter-routing-key", "retry-test-dlq)");
+            return new Queue("retry-test", true, false, false, args);
         }
 
         @Bean
         public Queue autoDeleteQueue2() {
-            return new Queue("retry-test");
+            Map<String, Object> args = new HashMap<>();
+            args.put("x-dead-letter-exchange", "tut.fanout.dlx");
+//            args.put("x-dead-letter-routing-key", "retry-test-dlq)");
+            return new Queue("retry-test", true, false, false, args);
+        }
+
+        @Bean
+        public Queue autoDeleteQueueDlq() {
+            return new Queue("retry-test-dlq");
+        }
+
+        @Bean
+        public Queue parkingLot() {
+            return new Queue("parking-lot");
         }
 
         @Bean
@@ -35,6 +59,11 @@ public class Config {
         @Bean
         public Binding binding2(FanoutExchange fanout, Queue autoDeleteQueue2) {
             return BindingBuilder.bind(autoDeleteQueue2).to(fanout);
+        }
+
+        @Bean
+        public Binding bindingDlq(FanoutExchange fanout, Queue autoDeleteQueueDlq) {
+            return BindingBuilder.bind(autoDeleteQueueDlq).to(fanout);
         }
 
         @Bean

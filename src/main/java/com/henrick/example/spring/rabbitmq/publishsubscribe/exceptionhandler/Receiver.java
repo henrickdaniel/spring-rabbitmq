@@ -38,6 +38,8 @@ public class Receiver {
                 Thread.sleep(1000);
             }
         }
+       log.info("throwing exception");
+        throw new RuntimeException("must reprocess");
     }
 
 }
